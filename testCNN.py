@@ -17,7 +17,8 @@ import time
 import gzip
 import pickle
 
-import numpy
+import numpy as np
+import math
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 from tensorflow.examples.tutorials.mnist import mnist
@@ -74,6 +75,7 @@ mode = int(sys.argv[1])
 #  change it.
 
 data_sets = input_data.read_data_sets(FLAGS.input_data_dir)
+out = open('Output'+str(mode)+'.txt','w')
 
 # ======================================================================
 #  STEP 1: Train a baseline model.
@@ -82,7 +84,7 @@ data_sets = input_data.read_data_sets(FLAGS.input_data_dir)
 
 if mode == 1:
   cnn = ConvNet(1)
-  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test)
+  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test,out)
 
   # Output accuracy.
   print(20 * '*' + 'model 1' + 20 * '*')
@@ -97,7 +99,7 @@ if mode == 1:
 
 if mode == 2:
   cnn = ConvNet(2)
-  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test)
+  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test,out)
 
   # Output accuracy.
   print(20 * '*' + 'model 2' + 20 * '*')

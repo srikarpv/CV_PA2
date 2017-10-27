@@ -1,5 +1,6 @@
 import time
-
+import numpy as np
+import math
 
 import tensorflow as tf
 
@@ -22,15 +23,24 @@ class ConvNet(object):
 
     # Baseline model. step 1
     def model_1(self, X, hidden_size):
-        # ======================================================================
-        # One fully connected layer.
-        #
-        # ----------------- YOUR CODE HERE ----------------------
-        #
-        # Uncomment the following return stmt once method implementation is done.
-        # return  fcl
-        # Delete line return NotImplementedError() once method is implemented.
-        return NotImplementedError()
+        # # ======================================================================
+        # # One fully connected layer.
+        # #
+        # # ----------------- YOUR CODE HERE ----------------------
+        # #
+        # # Uncomment the following return stmt once method implementation is done.
+        # # return  fcl
+        # # Delete line return NotImplementedError() once method is implemented.
+        # return NotImplementedError()
+        X1 = tf.reshape(X,[-1,784])
+        W = tf.Variable(tf.truncated_normal([784,hidden_size],stddev=1.0/math.sqrt(float(784))))
+        b = tf.Variable(tf.zeros([hidden_size]))
+        W1 = tf.Variable(tf.truncated_normal([hidden_size,10],stddev=1.0/math.sqrt(float(hidden_size))))
+        b1 = tf.Variable(tf.zeros([10]))
+        h1 =tf.sigmoid(tf.matmul(X1,W)+b)
+        y = tf.matmul(h1,W1)+b1
+
+        return y
 
     # Use two convolutional layers.
     def model_2(self, X, hidden_size):
@@ -42,7 +52,20 @@ class ConvNet(object):
         # Uncomment the following return stmt once method implementation is done.
         # return  fcl
         # Delete line return NotImplementedError() once method is implemented.
-        return NotImplementedError()
+        #return NotImplementedError()
+        conv1 = tf.layers.conv2d(X,20,5,activation = tf.nn.sigmoid)
+        conv1 = tf.layers.max_pooling2d(conv1,2,2)
+        conv2 = tf.layers.conv2d(conv1,40,5,activation= tf.nn.sigmoid)
+        conv2 = tf.layers.max_pooling2d(conv2,2,2)
+        X1 = tf.reshape(conv2,[-1,640])
+        W = tf.Variable(tf.truncated_normal([640,hidden_size],stddev = 1.0 / math.sqrt(float(640))))
+        b = tf.Variable(tf.zeros([hidden_size]))
+        W1 = tf.Variable(tf.truncated_normal([hidden_size,10],stddev = 1.0 / math.sqrt(float(hidden_size))))
+        b1 = tf.Variable(tf.zeros([10]))
+        h1 = tf.sigmoid(tf.matmul(X1,W)+b)
+        y = tf.matmul(h1,W1)+b1
+
+        return y
 
     # Replace sigmoid with ReLU.
     def model_3(self, X, hidden_size):
@@ -83,7 +106,7 @@ class ConvNet(object):
         return NotImplementedError()
 
     # Entry point for training and evaluation.
-    def train_and_evaluate(self, FLAGS, train_set, test_set):
+    def train_and_evaluate(self, FLAGS, train_set, test_set,out):
         class_num = 10
         num_epochs = FLAGS.num_epochs
         batch_size = FLAGS.batch_size
@@ -109,6 +132,7 @@ class ConvNet(object):
             # model 1: base line
             if self.mode == 1:
                 features = self.model_1(X, hidden_size)
+                weight = 0
 
 
 
@@ -134,33 +158,41 @@ class ConvNet(object):
             # ----------------- YOUR CODE HERE ----------------------
             #
             # Remove NotImplementedError and assign calculated value to logits after code implementation.
-            logits = NotImplementedError
+            logits = features
+            beta = 0.0001
 
             # ======================================================================
             # Define loss function, use the logits.
             # ----------------- YOUR CODE HERE ----------------------
             #
             # Remove NotImplementedError and assign calculated value to loss after code implementation.
-            loss = NotImplementedError
+            labels = tf.to_int64(Y)
+            cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels = labels, logits= logits, name = 'xentropy')
+            loss = tf.reduce_mean(cross_entropy,name = 'xentropy_mean')
+            #loss = tf.reduce_mean(cross_entropy+beta*weight, name = 'xentropy_mean')
+
+            #loss = NotImplementedError
 
             # ======================================================================
             # Define training op, use the loss.
             # ----------------- YOUR CODE HERE ----------------------
             #
             # Remove NotImplementedError and assign calculated value to train_op after code implementation.
-            train_op = NotImplementedError
+            train_op = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
 
             # ======================================================================
             # Define accuracy op.
             # ----------------- YOUR CODE HERE ----------------------
             #
-            accuracy = NotImplementedError
+            correct_prediction = tf.equal(tf.argmax(logits,1),labels)
+
+            accuracy = tf.reduce_mean(tf.cast(correct_prediction,tf.float32))
 
             # ======================================================================
             # Allocate percentage of GPU memory to the session.
             # If you system does not have GPU, set has_GPU = False
             #
-            has_GPU = True
+            has_GPU = False
             if has_GPU:
                 gpu_option = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
                 config = tf.ConfigProto(gpu_options=gpu_option)
