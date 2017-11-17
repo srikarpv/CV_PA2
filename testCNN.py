@@ -115,7 +115,7 @@ if mode == 2:
 if mode == 3:
   FLAGS.learning_rate = 0.03
   cnn = ConvNet(3)
-  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test)
+  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test,out)
 
   # Output accuracy.
   print(20 * '*' + 'model 3' + 20 * '*')
@@ -131,7 +131,7 @@ if mode == 3:
 if mode == 4:
   FLAGS.learning_rate = 0.03
   cnn = ConvNet(4)
-  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test)
+  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test,out)
 
   # Output accuracy.
   print(20 * '*' + 'model 4' + 20 * '*')
@@ -149,7 +149,7 @@ if mode == 5:
   FLAGS.num_epochs    = 40
   FLAGS.hiddenSize    = 1000
   cnn = ConvNet(5)
-  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test)
+  accuracy = cnn.train_and_evaluate(FLAGS, data_sets.train, data_sets.test,out)
 
   # Output accuracy.
   print(20 * '*' + 'model 5' + 20 * '*')
